@@ -1,5 +1,7 @@
 # STONK
 
+https://user-images.githubusercontent.com/52292457/123099593-0d458a00-d452-11eb-8086-81d87bf255ad.mp4
+
 ## Installation
 ```console
 pip install nepal_stonks
