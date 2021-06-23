@@ -1,8 +1,8 @@
 # STONK
 
-# Installation
+## Installation
 `pip install nepal_stonks`
 
-# Usage
+## Usage
 After the installation you can use the cli application with the priceof command
 
