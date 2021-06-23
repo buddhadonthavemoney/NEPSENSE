@@ -1,7 +1,3 @@
-
-
-https://user-images.githubusercontent.com/52292457/123099116-99a37d00-d451-11eb-91aa-12a30f91ab01.mp4
-
 # STONK
 
 ## Installation
