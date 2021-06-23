@@ -18,15 +18,11 @@ def main():
         )
     parse.add_argument(
             '-n', '--nepse',  action='store_true',
-            help="save NEPSE index"
-        )
-    parse.add_argument(
-            '-s', '--sub_indices', action='store_true', 
-            help = "get subindices" 
+            help="get NEPSE index and subindices"
         )
     parse.add_argument(
             '-m', '--market_depth', 
-            help = "get subindices", metavar=''
+            help = "get market_depth", metavar=''
         )
     parse.add_argument(
             '-ms', '--market_summary', 
@@ -38,7 +34,7 @@ def main():
         )
     parse.add_argument(
             '-cu', '--custom', metavar='', 
-            help="custom list in hi.py"
+            help="custom list in data.py"
         )
     parse.add_argument(
             '-ci', '--change_index', metavar='',
@@ -83,10 +79,6 @@ def main():
         stocks.print_stocks_prices()
 
     if args.nepse:
-        stocks = NEPSE([])
-        stocks.get_subindices()
-
-    if args.sub_indices:
         stocks = NEPSE([])
         stocks.get_subindices()
 
