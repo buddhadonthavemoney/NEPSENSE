@@ -7,10 +7,13 @@ import pathlib
 import os
 
 def main():
-    parse = argparse.ArgumentParser(description = "STONK", prog="priceof")
+    parse = argparse.ArgumentParser(
+            description = "STONK, complete NEPSE solution in command line", 
+            prog="priceof"
+        )
     parse.add_argument(
             '-c' , '--company', metavar='', 
-            help="symbols of companies", nargs='*'
+            help="symbols of companies seperated by space", nargs='*'
         )
     parse.add_argument(
             '-f', '--floorsheet', action='store_true',
@@ -22,7 +25,8 @@ def main():
         )
     parse.add_argument(
             '-m', '--market_depth', 
-            help = "get market_depth", metavar=''
+            help = "get market depth of the company(enter symbol)", metavar='',
+
         )
     parse.add_argument(
             '-ms', '--market_summary', 
@@ -50,24 +54,24 @@ def main():
         )
     parse.add_argument(
             '--supply', action='store_true',
-            help="get the shares with maximum supply"
+            help="get the scripts with maximum supply"
         )
     parse.add_argument(
             '--demand', action='store_true',
-            help="get the share with maximum demand"
+            help="get the scripts with maximum demand"
         )
     parse.add_argument(
             '--turnover', action='store_true',
-            help="get the shares with maximum turnover"
+            help="get the scripts with maximum turnover"
         )
 
     parse.add_argument(
             '--volume', action='store_true',
-            help="get the shares with maximum volume"
+            help="get the scripts with maximum volume"
         )
     parse.add_argument(
             '--transactions', action='store_true',
-            help="get the shares with maximum transactions"
+            help="get the scripts with maximum transactions"
         )
 
     args = parse.parse_args()
