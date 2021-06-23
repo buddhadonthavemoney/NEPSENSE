@@ -41,6 +41,7 @@ optional arguments:
 ```
 
 ## Please change the index with -ci flag.
+If you get this type of message when using the cli. Review the following video
 https://user-images.githubusercontent.com/52292457/123106754-a1b2eb00-d458-11eb-924c-591f24bcb4e2.mp4
 
 
