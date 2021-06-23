@@ -54,7 +54,8 @@ The payload looks like
   "id" : 123
 }
 ```
-Here 123 is a random number. This number can be changed using the -ci flag. This is demonstrated in the video above
+Here 123 is a random number. This number can be changed using the -ci flag. To get the id we have to 
+inspect the network traffic while loading the nepse's newweb website. This is demonstrated in the video above
 
 
 
