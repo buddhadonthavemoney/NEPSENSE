@@ -26,7 +26,6 @@ class NEPSE(__Data):
             "Volume", "PC", "Open", "Close", "low - high", "52 weekrange", 
             "total shares","total public", "networth"])
 
-
     def get_stocks_info(self):
         return [Stock(i) for i in self.symbol_list]
 
@@ -80,7 +79,7 @@ class NEPSE(__Data):
                        # tablefmt='pretty', showindex=False))
         print(f"total trading scripts: {len(self.stocks_list)}")
 
-    def get_subindices(self):
+    def get_indices(self):
         r_indices = requests.get(
                 self.url_index, 
                 headers=self.alt_headers
@@ -93,7 +92,7 @@ class NEPSE(__Data):
         r_indices.append(r_nepse[0])
         df = pd.DataFrame(
             columns=["index", "change", "perChange", "currentValue"])
-        copy_df = df.copy()
+        self.nepse_df = df.copy()
         for i in r_indices:
             x = dict()
             x["perChange"] = i["perChange"]
@@ -111,18 +110,20 @@ class NEPSE(__Data):
                 i["change"] = x["change"]
                 i["index"] = x["index"]
                 i["currentValue"] = x["currentValue"]
-                copy_df = copy_df.append(i, ignore_index=True)
+                self.nepse_df = self.nepse_df.append(i, ignore_index=True)
                 continue
             df = df.append(x, ignore_index=True)
-        #for nepse
-        x = requests.get(self.url_nepse, headers=self.alt_headers).json()
-        
-        # print(df["index"])
-        print(tabulate(df.sort_values("perChange", ascending=False),
+        self.subindices_df = df
+
+
+    def display_subindices(self):
+        print(tabulate(self.subindices_df.sort_values("perChange", ascending=False),
                 headers="keys", tablefmt='pretty', showindex=False)
             )
 
-        print(tabulate(copy_df.dropna(axis=1), headers="keys",
+
+    def display_nepse_index(self):
+        print(tabulate(self.nepse_df.dropna(axis=1), headers="keys",
             tablefmt='pretty', showindex=False))
 
 

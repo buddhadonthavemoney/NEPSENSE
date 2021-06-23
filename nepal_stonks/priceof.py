@@ -21,7 +21,11 @@ def main():
         )
     parse.add_argument(
             '-n', '--nepse',  action='store_true',
-            help="get NEPSE index and subindices"
+            help="get NEPSE index"
+        )
+    parse.add_argument(
+            '-s', '--sub-indices',  action='store_true',
+            help="get subindices"
         )
     parse.add_argument(
             '-m', '--market_depth', 
@@ -84,7 +88,16 @@ def main():
 
     if args.nepse:
         stocks = NEPSE([])
-        stocks.get_subindices()
+        stocks.get_indices()
+        stocks.display_nepse_index()
+
+    if args.sub_indices:
+        if args.nepse:
+            stocks.display_nepse_index()
+        else:
+            stocks = NEPSE([])
+            stocks.get_indices()
+            stocks.display_subindices()
 
     market_depth = args.market_depth
     if market_depth:
