@@ -1,5 +1,10 @@
+
+
+
 # STONK
 Complete NEPSE solution in command line
+
+https://user-images.githubusercontent.com/52292457/123103383-a924c500-d455-11eb-94a4-b1fde8ff8c48.mp4
 ## Installation
 ```console
 pip install nepal_stonks
