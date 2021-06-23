@@ -47,7 +47,7 @@ https://user-images.githubusercontent.com/52292457/123106754-a1b2eb00-d458-11eb-
 
 
 Since i can't afford to pay for the nepse api(I don't think I would, even if I could, but anyways). 
-There is some caveat to retrieving data from api endpoints from the nepse's newweb website. Nepse decided
+There are some caveats to retrieving data from api endpoints from the nepse's newweb website. Nepse decided
 to change the request method for some api endpoints from get to post. The payload sent along with the
 post request changes randomly at different intervals. 
 The payload looks like 
