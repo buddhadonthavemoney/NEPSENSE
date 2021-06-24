@@ -13,24 +13,26 @@ After the installation you can use the cli application with the priceof command
 
 ## Usage
 ```console
-usage: priceof [-h] [-c [...]] [-f] [-n] [-m] [-ms] [-d] [-cu] [-ci]
-               [--losers] [--gainers] [--supply] [--demand] [--turnover]
-               [--volume] [--transactions]
+usage: priceof [-h] [-c  [...]] [-f [path ...]] [-n] [-s] [-m symbol] [-ms] [-d] [-cu] [-ci] [--losers] [--gainers] [--supply] [--demand] [--turnover] [--volume] [--transactions]
 
 STONK, complete NEPSE solution in command line
 
 optional arguments:
   -h, --help            show this help message and exit
-  -c [ ...], --company [ ...]
+  -c  [ ...], --company  [ ...]
                         symbols of companies seperated by space
-  -f, --floorsheet      get floorsheet
-  -n, --nepse           get NEPSE index and subindices
-  -m , --market_depth   get market depth of the company(enter symbol)
-  -ms, --market_summary get market summary
+  -f [path ...], --floorsheet [path ...]
+                        Saves today's floorsheet as a csv file You can specify the path as argument. if no argument is provided the csv file will be saved in the current directory
+  -n, --nepse           get NEPSE index
+  -s, --sub-indices     get subindices
+  -m symbol, --market_depth symbol
+                        get market depth of a company
+  -ms, --market_summary
+                        get market summary
   -d , --get_detail     get the non price related detail of the company
   -cu , --custom        custom list in data.py
-  -ci , --change_index  change the value of id sent as a payload in the post
-                        request
+  -ci , --change_index 
+                        change the value of id sent as a payload in the post request
   --losers              get the top losers
   --gainers             get the top gainers
   --supply              get the scripts with maximum supply
