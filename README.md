@@ -13,7 +13,8 @@ After the installation you can use the cli application with the priceof command
 
 ## Usage
 ```console
-usage: priceof [-h] [-c  [...]] [-f [path ...]] [-n] [-s] [-m symbol] [-ms] [-d] [-cu] [-ci] [--losers] [--gainers] [--supply] [--demand] [--turnover] [--volume] [--transactions]
+usage: priceof [-h] [-c  [...]] [-f [path ...]] [-n] [-s] [-m symbol] [-ms] [-d] [-cu] [-ci] [--losers] [--gainers]
+[--supply] [--demand] [--turnover] [--volume] [--transactions]
 
 STONK, complete NEPSE solution in command line
 
@@ -22,7 +23,8 @@ optional arguments:
   -c  [ ...], --company  [ ...]
                         symbols of companies seperated by space
   -f [path ...], --floorsheet [path ...]
-                        Saves today's floorsheet as a csv file You can specify the path as argument. if no argument is provided the csv file will be saved in the current directory
+                        Saves today's floorsheet as a csv file You can specify the path as argument. if no argument 
+                        is provided the csv file will be saved in the current directory
   -n, --nepse           get NEPSE index
   -s, --sub-indices     get subindices
   -m symbol, --market_depth symbol
@@ -61,5 +63,11 @@ The payload looks like
 Here 123 is a random number. This number can be changed using the -ci flag. To get the id we have to 
 inspect the network traffic while loading the nepse's newweb website. This is demonstrated in the video above
 
-
+## Floorsheet
+```
+priceof -f [path]
+```
+You can either specify a path or leave it blank. If you leave it blank the floorsheet csv file will be
+saved in you current directory. The floorsheet file will be saved as floorsheet_todaysdata_weekday.csv
+You can do different kind of analysis on the data using the floorsheet.ipynb notebook. 
 
