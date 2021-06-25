@@ -85,6 +85,8 @@ class NEPSE(__Data):
                        # tablefmt='pretty', showindex=False))
 
     def get_indices(self):
+        self._start_animation_thread("getting indices", hasCount=False)
+
         r_indices = requests.get(
                 self.url_index, 
                 headers=self.alt_headers
@@ -93,6 +95,8 @@ class NEPSE(__Data):
                 self.url_nepse, 
                 headers=self.alt_headers
             ).json()
+
+        self._stop_animation_thread()
 
         r_nepse = [x for x in r_nepse if x["index"] == "NEPSE Index"]
         r_indices.append(r_nepse[0])
@@ -134,7 +138,12 @@ class NEPSE(__Data):
 
 
     def get_market_summary(self):
+        self._start_animation_thread("getting market summary", hasCount=False)
+
         x = requests.get(self.url_market_summary, headers = self.alt_headers).json()
+
+        self._stop_animation_thread()
+
         self.market_summary = dict()
         for i in x:
             self.market_summary[f"{i['detail']}"] = i['value'] 
@@ -145,7 +154,12 @@ class NEPSE(__Data):
             print(f"{key} = {value}")
 
     def get_top_gainers(self):
+        self._start_animation_thread("getting gainers", hasCount=False)
+
         re = requests.get(self.url_top_gainers, headers=self.alt_headers).json()
+
+        self._stop_animation_thread()
+
         self.df_gainers = pd.DataFrame(re)
         df = self.df_gainers.rename(
                 {
@@ -163,7 +177,11 @@ class NEPSE(__Data):
 
 
     def get_top_losers(self):
+        self._start_animation_thread("getting losers", hasCount=False)
+
         re = requests.get(self.url_top_losers, headers=self.alt_headers).json()
+
+        self._stop_animation_thread()
         self.df_losers = pd.DataFrame(re)
         df = self.df_losers.rename(
                 {'symbol': f'{Fore.RED}symbol', 'securityName': f'securityName{Style.RESET_ALL}'}, 
@@ -176,7 +194,11 @@ class NEPSE(__Data):
         )
 
     def get_top_turnover(self):
+        self._start_animation_thread("getting turnover", hasCount=False)
+
         re = requests.get(self.url_top_turnover, headers=self.alt_headers).json()
+
+        self._stop_animation_thread()
         self.df_turnover = pd.DataFrame(re)
         df = self.df_turnover.rename(
                 {'symbol': f'{Fore.GREEN}symbol', 'closingPrice':'LTP', 'securityName': f'securityName{Style.RESET_ALL}'}, 
@@ -189,7 +211,11 @@ class NEPSE(__Data):
         )
 
     def get_top_volume(self):
+        self._start_animation_thread("getting volume", hasCount=False)
+
         re = requests.get(self.url_top_volume, headers=self.alt_headers).json()
+
+        self._stop_animation_thread()
         self.df_volume = pd.DataFrame(re)
         df = self.df_volume.rename(
                 {'symbol': f'{Fore.CYAN}symbol', 'closingPrice':'LTP', 'securityName': f'securityName{Style.RESET_ALL}'}, 
@@ -223,7 +249,11 @@ class NEPSE(__Data):
         )
 
     def get_top_transactions(self):
+        self._start_animation_thread("getting top transactions", hasCount=False)
+
         re = requests.get(self.url_top_transactions, headers=self.alt_headers).json()
+        
+        self._stop_animation_thread()
         self.df_transactions = pd.DataFrame(re)
         df = self.df_transactions.rename(
                 {'symbol': f'{Fore.CYAN}symbol', 'lastTradedPrice':'LTP', 'securityName': f'securityName{Style.RESET_ALL}'}, 
@@ -265,7 +295,8 @@ class NEPSE(__Data):
                 floorsheet = r["floorsheets"]["content"]
             except:
                 self._stop_animation_thread()
-                print("\nPlease change the index with -ci flag.")
+                print(("\nPlease change the index with -ci flag. "
+                        "\nCheck https://github.com/buddha231/NEPSENSE for more info"))
                 return
 
             for x in floorsheet:

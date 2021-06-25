@@ -65,19 +65,19 @@ class __Data:
             time.sleep(0.08) 
 
     def _start_animation_thread(self, text, hasCount):
-        thread = Thread(target=self._loading, 
+        self.thread = Thread(target=self._loading, 
                 kwargs={
                     "text":text, 
                     "hasCount": hasCount
                 }, 
                 daemon=True
             )
-        thread.start()
+        self.thread.start()
 
     def _stop_animation_thread(self):
         self._done = True
-        print("\n", flush=True)
-
+        print()
+        self.thread.join()
 
     def get_index(self):
         try:

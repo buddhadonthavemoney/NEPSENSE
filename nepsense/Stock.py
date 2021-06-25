@@ -70,7 +70,8 @@ class Stock(__Data):
         try:
             detail = x["securityDailyTradeDto"]
         except:
-            print("\nPlease change the index with -ci flag.")
+            print(("\n\nPlease change the index with -ci flag. "
+                    "\nCheck https://github.com/buddha231/nepsense for more info"))
             sys.exit()
             return
         self.ltp = detail["lastTradedPrice"]

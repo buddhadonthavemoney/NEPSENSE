@@ -6,7 +6,7 @@ with open('README.md', encoding='utf-8') as f:
     long_description = f.read()
 setup(
         name ='nepsense',
-        version ='0.0.1',
+        version ='0.0.3',
         author ='Buddha Gautam',
         author_email ='buddhagautam231@gmail.com',
         url ='https://github.com/buddha231/NEPSENSE',
