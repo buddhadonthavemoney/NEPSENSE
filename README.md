@@ -68,7 +68,7 @@ inspect the network traffic while loading the nepse's newweb website. This is de
 priceof -f [path]
 ```
 You can either specify a path or leave it blank. If you leave it blank the floorsheet csv file will be
-saved in you current directory. The floorsheet file will be saved as floorsheet_todaysdata_weekday.csv
+saved in you current directory. The floorsheet file will be saved as floorsheet_todaysdate_weekday.csv
 You can do different kind of analysis on the data using the floorsheet.ipynb notebook. 
 
 You can also use my public google collab notebook
