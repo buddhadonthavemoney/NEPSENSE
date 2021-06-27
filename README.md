@@ -4,7 +4,9 @@
 # NEPSENSE
 Complete NEPSE solution in command line
 
-https://user-images.githubusercontent.com/52292457/123103383-a924c500-d455-11eb-94a4-b1fde8ff8c48.mp4
+https://user-images.githubusercontent.com/52292457/123535784-e636d300-d745-11eb-9fe3-3ad4b8e21078.mp4
+
+
 ## Installation
 ```console
 pip install nepsense
