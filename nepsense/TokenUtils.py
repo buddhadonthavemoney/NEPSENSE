@@ -1,0 +1,281 @@
+import pywasm
+import time
+import pathlib
+import asyncio
+
+from datetime import datetime
+
+
+class _TokenManager:
+    def __init__(self, request_manager):
+        self.request_client = request_manager
+
+        self.MAX_UPDATE_PERIOD = 45
+
+        self.token_parser = TokenParser()
+
+        self.token_url = "https://nepalstock.com/api/authenticate/prove"
+        self.refresh_url = "https://nepalstock.com/api/authenticate/refresh-token"
+
+        self.access_token = None
+        self.refresh_token = None
+        self.token_time_stamp = None
+        self.salts = None
+
+    def isTokenValid(self):
+        return (
+            (int(time.time()) - self.token_time_stamp) < self.MAX_UPDATE_PERIOD
+            if self.token_time_stamp
+            else False
+        )
+
+    def __repr__(self):
+        return (
+            f"Access Token: {self.access_token}\nRefresh Token: {self.refresh_token}\nSalts: {self.salts}\nTimeStamp: {datetime.fromtimestamp(self.token_time_stamp).strftime('%Y-%m-%d %H:%M:%S')}"
+            if self.access_token is not None
+            else "Token Manager Not Initialized"
+        )
+
+    def _getValidTokenFromJSON(self, token_response):
+        salts = []
+
+        for salt_index in range(1, 6):
+            val = int(token_response[f"salt{salt_index}"])
+            salts.append(val)
+
+        return (
+            *self.token_parser.parse_token_response(token_response),
+            int(token_response["serverTime"] / 1000),
+            salts,
+        )
+
+
+class AsyncTokenManager(_TokenManager):
+    def __init__(self, request_manager):
+        super().__init__(request_manager)
+
+        self.update_started = asyncio.Event()
+        self.update_completed = asyncio.Event()
+
+    async def getAccessToken(self):
+        if self.isTokenValid():
+            return self.access_token
+        else:
+            await self.update()
+            return self.access_token
+
+    async def getRefreshToken(self):
+        if self.isTokenValid():
+            return self.access_token
+        else:
+            await self.update()
+            return self.refresh_token
+
+    async def update(self):
+        await self._setToken()
+
+    async def _setToken(self):
+        if not self.update_started.is_set():
+            self.update_started.set()
+            self.update_completed.clear()
+            json_response = await self._getTokenHttpRequest()
+            (
+                self.access_token,
+                self.refresh_token,
+                self.token_time_stamp,
+                self.salts,
+            ) = self._getValidTokenFromJSON(json_response)
+            self.update_completed.set()
+            self.update_started.clear()
+        else:
+            await self.update_completed.wait()
+
+    async def _getTokenHttpRequest(self):
+        return await self.request_client.requestGETAPI(
+            url=self.token_url, include_authorization_headers=False
+        )
+
+
+class TokenManager(_TokenManager):
+    def __init__(self, request_manager):
+        super().__init__(request_manager)
+
+    def getAccessToken(self):
+        return (
+            self.access_token
+            if self.isTokenValid()
+            else self.update() or self.access_token
+        )
+
+    def getRefreshToken(self):
+        return (
+            self.refresh_token
+            if self.isTokenValid()
+            else self.update() or self.refresh_token
+        )
+
+    def update(self):
+        self._setToken()
+
+    def _setToken(self):
+        json_response = self._getTokenHttpRequest()
+
+        (
+            self.access_token,
+            self.refresh_token,
+            self.token_time_stamp,
+            self.salts,
+        ) = self._getValidTokenFromJSON(json_response)
+
+    def _getTokenHttpRequest(self):
+        return self.request_client.get(
+            url=self.token_url, include_authorization_headers=False
+        ).json()
+
+    def _getValidTokenFromJSON(self, token_response):
+        salts = []
+
+        for salt_index in range(1, 6):
+            val = int(token_response[f"salt{salt_index}"])
+            salts.append(val)
+
+        return (
+            *self.token_parser.parse_token_response(token_response),
+            int(token_response["serverTime"] / 1000),
+            salts,
+        )
+
+
+class TokenParser:
+    def __init__(self):
+        self.runtime = pywasm.load(f"{pathlib.Path(__file__).parent}/css.wasm")
+
+    def parse_token_response(self, token_response):
+        n = self.runtime.exec(
+            "cdx",
+            [
+                token_response["salt1"],
+                token_response["salt2"],
+                token_response["salt3"],
+                token_response["salt4"],
+                token_response["salt5"],
+            ],
+        )
+        l = self.runtime.exec(
+            "rdx",
+            [
+                token_response["salt1"],
+                token_response["salt2"],
+                token_response["salt4"],
+                token_response["salt3"],
+                token_response["salt5"],
+            ],
+        )
+        o = self.runtime.exec(
+            "bdx",
+            [
+                token_response["salt1"],
+                token_response["salt2"],
+                token_response["salt4"],
+                token_response["salt3"],
+                token_response["salt5"],
+            ],
+        )
+        p = self.runtime.exec(
+            "ndx",
+            [
+                token_response["salt1"],
+                token_response["salt2"],
+                token_response["salt4"],
+                token_response["salt3"],
+                token_response["salt5"],
+            ],
+        )
+        q = self.runtime.exec(
+            "mdx",
+            [
+                token_response["salt1"],
+                token_response["salt2"],
+                token_response["salt4"],
+                token_response["salt3"],
+                token_response["salt5"],
+            ],
+        )
+
+        a = self.runtime.exec(
+            "cdx",
+            [
+                token_response["salt2"],
+                token_response["salt1"],
+                token_response["salt3"],
+                token_response["salt5"],
+                token_response["salt4"],
+            ],
+        )
+        b = self.runtime.exec(
+            "rdx",
+            [
+                token_response["salt2"],
+                token_response["salt1"],
+                token_response["salt3"],
+                token_response["salt4"],
+                token_response["salt5"],
+            ],
+        )
+        c = self.runtime.exec(
+            "bdx",
+            [
+                token_response["salt2"],
+                token_response["salt1"],
+                token_response["salt4"],
+                token_response["salt3"],
+                token_response["salt5"],
+            ],
+        )
+        d = self.runtime.exec(
+            "ndx",
+            [
+                token_response["salt2"],
+                token_response["salt1"],
+                token_response["salt4"],
+                token_response["salt3"],
+                token_response["salt5"],
+            ],
+        )
+        e = self.runtime.exec(
+            "mdx",
+            [
+                token_response["salt2"],
+                token_response["salt1"],
+                token_response["salt4"],
+                token_response["salt3"],
+                token_response["salt5"],
+            ],
+        )
+
+        access_token = token_response["accessToken"]
+        refresh_token = token_response["refreshToken"]
+
+        # print(f"refresh token index {a}, {b}, {c}, {d}, {e}", refresh_token)
+        # print(f"access token index {n}, {l}, {o}, {p}, {q}", access_token)
+
+        parsed_access_token = (
+            access_token[0:n]
+            + access_token[n + 1 : l]
+            + access_token[l + 1 : o]
+            + access_token[o + 1 : p]
+            + access_token[p + 1 : q]
+            + access_token[q + 1 :]
+        )
+        parsed_refresh_token = (
+            refresh_token[0:a]
+            + refresh_token[a + 1 : b]
+            + refresh_token[b + 1 : c]
+            + refresh_token[c + 1 : d]
+            + refresh_token[d + 1 : e]
+            + refresh_token[e + 1 :]
+        )
+
+        # returns both access_token and refresh_token, i don't know what's the purpose of refresh token.
+        # Right now new access_token can be used for every new api request
+        return (parsed_access_token, parsed_refresh_token)

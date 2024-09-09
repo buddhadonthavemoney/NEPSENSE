@@ -1,86 +1,79 @@
 #!/usr/bin/env python3
-
-import sys
-import argparse
-from nepsense.Stock import Stock
-from nepsense.Nepse import NEPSE 
-import argparse
-from pathlib import Path 
 import os
+import argparse
+
+from Stock import Stock
+from Nepse import NEPSE
+from pathlib import Path
+
 
 def main():
     parse = argparse.ArgumentParser(
-            description = "STONK, complete NEPSE solution in command line", 
-            prog="priceof"
-        )
+        description="STONK, complete NEPSE solution in command line", prog="priceof"
+    )
     parse.add_argument(
-            '-c' , '--company', metavar='', 
-            help="symbols of companies seperated by space", nargs='+'
-        )
+        "-c",
+        "--company",
+        metavar="",
+        help="symbols of companies seperated by space",
+        nargs="+",
+    )
     parse.add_argument(
-            '-f', '--floorsheet', metavar = 'path', type=Path, nargs='*',
-            help = "Saves today's floorsheet as a csv file You can specify the\
+        "-f",
+        "--floorsheet",
+        metavar="path",
+        type=Path,
+        nargs="*",
+        help="Saves today's floorsheet as a csv file You can specify the\
                     path as argument. if no argument is provided csv file will\
-                    be saved in the current directory"
-        )
+                    be saved in the current directory",
+    )
+    parse.add_argument("-n", "--nepse", action="store_true", help="get NEPSE index")
     parse.add_argument(
-            '-n', '--nepse',  action='store_true',
-            help="get NEPSE index"
-        )
+        "-s", "--sub-indices", action="store_true", help="get subindices"
+    )
     parse.add_argument(
-            '-s', '--sub-indices',  action='store_true',
-            help="get subindices"
-        )
+        "-m",
+        "--market_depth",
+        help="get market depth of a company",
+        metavar="symbol",
+    )
     parse.add_argument(
-            '-m', '--market_depth', 
-            help = "get market depth of a company", metavar='symbol',
-
-        )
+        "-ms", "--market_summary", help="get market summary", action="store_true"
+    )
     parse.add_argument(
-            '-ms', '--market_summary', 
-            help = "get market summary", action='store_true' 
-        )
+        "-d",
+        "--get_detail",
+        metavar="",
+        help="get the non price related detail of the company",
+    )
+    parse.add_argument("-cu", "--custom", metavar="", help="custom list in data.py")
     parse.add_argument(
-            '-d', '--get_detail', metavar='', 
-            help = "get the non price related detail of the company"
-        )
+        "-ci",
+        "--change_index",
+        metavar="",
+        help="change the value of id sent as a payload in the post request",
+    )
+    parse.add_argument("--losers", action="store_true", help="get the top losers")
+    parse.add_argument("--gainers", action="store_true", help="get the top gainers")
     parse.add_argument(
-            '-cu', '--custom', metavar='', 
-            help="custom list in data.py"
-        )
+        "--supply", action="store_true", help="get the scripts with maximum supply"
+    )
     parse.add_argument(
-            '-ci', '--change_index', metavar='',
-            help="change the value of id sent as a payload in the post request"
-        )
+        "--demand", action="store_true", help="get the scripts with maximum demand"
+    )
     parse.add_argument(
-            '--losers', action='store_true',
-            help="get the top losers"
-        )
-    parse.add_argument(
-            '--gainers', action='store_true',
-            help="get the top gainers"
-        )
-    parse.add_argument(
-            '--supply', action='store_true',
-            help="get the scripts with maximum supply"
-        )
-    parse.add_argument(
-            '--demand', action='store_true',
-            help="get the scripts with maximum demand"
-        )
-    parse.add_argument(
-            '--turnover', action='store_true',
-            help="get the scripts with maximum turnover"
-        )
+        "--turnover", action="store_true", help="get the scripts with maximum turnover"
+    )
 
     parse.add_argument(
-            '--volume', action='store_true',
-            help="get the scripts with maximum volume"
-        )
+        "--volume", action="store_true", help="get the scripts with maximum volume"
+    )
     parse.add_argument(
-            '--transactions', action='store_true',
-            help="get the scripts with maximum transactions"
-        )
+        "--transactions",
+        action="store_true",
+        help="get the scripts with maximum transactions",
+    )
 
     args = parse.parse_args()
 
@@ -116,7 +109,7 @@ def main():
         stocks.scrape_stocks_prices()
         stocks.print_stocks_prices()
 
-    if args.floorsheet is not None :
+    if args.floorsheet is not None:
         if args.floorsheet:
             path = os.path.abspath(args.floorsheet[0])
         else:
@@ -161,5 +154,9 @@ def main():
         stocks = NEPSE([])
         stocks.get_top_supplydemand(supply=False)
 
+
 if __name__ == "__main__":
     main()
+    # nepse = NEPSE([])
+    # nepse.get_top_supplydemand(supply=False)
+    # nepse.get_top_gainers()
