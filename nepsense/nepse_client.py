@@ -1,14 +1,26 @@
 from nepse import Nepse as NepseBase
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Union
 import sys
 from datetime import datetime
 import json
 from functools import wraps
 from pathlib import Path
 from subprocess import run
+from tqdm import tqdm
+import time
+from .utils import with_progress
 
 def trace_api(func):
-    """Decorator to trace API calls and responses"""
+    """Decorator to trace API calls and responses
+    
+    Logs API method calls and their responses when tracing is enabled.
+    
+    Args:
+        func: The API method to trace
+        
+    Returns:
+        Wrapped function that includes tracing
+    """
     @wraps(func)
     def wrapper(self, *args, **kwargs):
         # Get method name from the original function
@@ -32,10 +44,46 @@ def trace_api(func):
         return result
     return wrapper
 
-class NepseClient:
+def with_loading(desc="Fetching data"):
+    """Decorator to show loading animation during API calls
+    
+    Displays a progress bar while the API call is executing.
+    
+    Args:
+        desc: Description to show in the progress bar
+        
+    Returns:
+        Decorator function that adds loading animation
     """
-    Client wrapper for NepseUnofficialApi
-    Original implementation by basic-bgnr: https://github.com/basic-bgnr/NepseUnofficialApi
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            with tqdm(total=100, desc=desc, bar_format='{desc}: {bar}| {percentage:3.0f}%') as pbar:
+                # Start the loading animation
+                pbar.update(10)
+                try:
+                    result = func(*args, **kwargs)
+                    pbar.update(90)  # Complete the progress
+                    return result
+                except Exception as e:
+                    pbar.close()
+                    raise e
+        return wrapper
+    return decorator
+
+class NepseClient:
+    """Client wrapper for accessing NEPSE market data
+    
+    Provides high-level methods to fetch various market data including:
+    - Stock prices and trading info
+    - Market indices
+    - Company details
+    - Market depth
+    - Top gainers/losers
+    
+    Attributes:
+        client: Underlying NEPSE API client
+        trace: Whether to enable API call tracing
     """
     
     def __init__(self, trace=False):
@@ -78,32 +126,29 @@ class NepseClient:
             delattr(self, 'debug_output')
     
     @trace_api
-    def get_stock_prices(self, symbols: List[str]) -> List[Dict[str, Any]]:
-        """Get current prices for given stock symbols"""
-        prices = []
-        for symbol in symbols:
-            details = self.client.getCompanyDetails(symbol)
-            if details and 'securityDailyTradeDto' in details:
-                trade = details['securityDailyTradeDto']
-                # Calculate changes
-                ltp = trade.get('lastTradedPrice', 0)
-                prev_close = trade.get('previousClose', 0)
-                change = ltp - prev_close if ltp and prev_close else 0
-                pct_change = (change / prev_close * 100) if prev_close else 0
-                
-                prices.append({
-                    'Symbol': symbol,
-                    'LTP': ltp,
-                    'change': change,
-                    '%change': pct_change,
-                    'Open': trade.get('openPrice'),
-                    'High': trade.get('highPrice'),
-                    'Low': trade.get('lowPrice'),
-                    'Volume': trade.get('totalTradeQuantity'),
-                    'Turnover': trade.get('totalTradeQuantity', 0) * ltp,  # Calculate turnover
-                    'Prev Close': trade.get('previousClose')
-                })
-        return prices
+    @with_progress("Fetching stock prices")
+    def get_stock_prices(self, symbol: Union[str, List[str]]) -> Union[Dict[str, Any], List[Dict[str, Any]]]:
+        """Get current price for a stock symbol"""
+        details = self.client.getCompanyDetails(symbol)
+        if details and 'securityDailyTradeDto' in details:
+            trade = details['securityDailyTradeDto']
+            ltp = trade.get('lastTradedPrice', 0)
+            prev_close = trade.get('previousClose', 0)
+            change = ltp - prev_close if ltp and prev_close else 0
+            
+            return {
+                'Symbol': symbol,
+                'LTP': ltp,
+                'change': change,
+                '%change': (change / prev_close * 100) if prev_close else 0,
+                'Open': trade.get('openPrice', 0),
+                'High': trade.get('highPrice', 0),
+                'Low': trade.get('lowPrice', 0),
+                'Volume': trade.get('totalTradeQuantity', 0),
+                'Turnover': trade.get('totalTradeValue', 0) or (trade.get('totalTradeQuantity', 0) * ltp),
+                'Prev Close': prev_close
+            }
+        return None
 
     @trace_api
     def get_nepse_index(self) -> Dict[str, Any]:
@@ -217,7 +262,8 @@ class NepseClient:
         }
 
     @trace_api
-    def get_company_details(self, symbol: str) -> Dict[str, Any]:
+    @with_progress("Fetching company details")
+    def get_company_details(self, symbol: Union[str, List[str]]) -> Union[Dict[str, Any], List[Dict[str, Any]]]:
         """Get detailed company information"""
         return self.client.getCompanyDetails(symbol)
 

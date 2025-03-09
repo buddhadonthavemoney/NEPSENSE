@@ -1,1 +1,6 @@
 -e .
+tabulate
+colorama
+pandas
+nepse-cli
+tqdm

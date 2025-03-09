@@ -5,8 +5,33 @@ from typing import Dict, List, Any, Union
 from datetime import datetime
 import calendar
 
+"""
+Formatting utilities for NEPSE market data
+
+This module handles formatting and display of market data in tables
+and other human-readable formats. Supports colored output for price
+changes and customizable table layouts.
+
+Classes:
+    TableFormatter: Main formatter class for market data
+"""
+
 class TableFormatter:
-    """Handles formatting and display of market data"""
+    """Handles formatting and display of market data
+    
+    Formats various types of market data into readable tables with:
+    - Colored price changes (green for positive, red for negative)
+    - Aligned columns
+    - Customizable headers
+    - Different layouts for different data types
+    
+    Methods:
+        print_table: Generic table printer
+        print_stock_prices: Format stock price data
+        print_company_details: Format detailed company info
+        print_market_depth: Format market depth data
+        print_top_list: Format top gainers/losers lists
+    """
     
     def __init__(self):
         self.style = {

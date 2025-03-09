@@ -4,8 +4,26 @@ from pathlib import Path
 from .nepse_client import NepseClient
 from .formatters import TableFormatter
 
+"""
+Command Line Interface for NEPSE market data
+
+This module provides a CLI tool to access NEPSE market data.
+It handles argument parsing and formatting output for terminal display.
+
+Classes:
+    NepseCLI: Main CLI handler class
+"""
+
 class NepseCLI:
-    """Command Line Interface for NEPSE market data"""
+    """Command Line Interface for NEPSE market data
+    
+    Provides command-line access to NEPSE market data with formatted output.
+    Supports various commands for fetching different types of market data.
+    
+    Attributes:
+        client: NepseClient instance for API access
+        formatter: TableFormatter instance for output formatting
+    """
     
     def __init__(self, trace=False):
         self.client = NepseClient(trace=trace)
@@ -100,11 +118,7 @@ class NepseCLI:
         
         # Company details
         if args.get_detail:
-            data = []
-            for symbol in args.get_detail:
-                company_data = self.client.get_company_details(symbol)
-                if company_data:
-                    data.append(company_data)
+            data = self.client.get_company_details(args.get_detail)
             self.formatter.print_company_details(data)
             return
         
