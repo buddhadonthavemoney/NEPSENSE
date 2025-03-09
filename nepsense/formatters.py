@@ -82,29 +82,12 @@ class TableFormatter:
         else:
             df = pd.DataFrame([data])
             
-        # Select and rename important columns based on data type
-        if 'index' in df.columns:  # For NEPSE index data
-            if 'high' in df.columns:  # Main NEPSE index
-                df = df[[
-                    'index', 'currentValue', 'change', 'perChange',
-                    'high', 'low', 'previousClose'
-                ]]
-                df.columns = [
-                    'Index', 'Value', 'Change', '%Change',
-                    'High', 'Low', 'Prev Close'
-                ]
-            else:  # Sub-indices
-                df = df[[
-                    'index', 'currentValue', 'change', 'perChange'
-                ]]
-                df.columns = [
-                    'Index', 'Value', 'Change', '%Change'
-                ]
-            
-            # Convert numeric columns
-            numeric_cols = df.columns.drop('Index')
+        # Convert numeric columns for color formatting
+        if 'Change' in df.columns:
+            numeric_cols = ['Value', 'Change', '%Change']
             for col in numeric_cols:
-                df[col] = pd.to_numeric(df[col], errors='coerce')
+                if col in df.columns:
+                    df[col] = pd.to_numeric(df[col], errors='coerce')
             
             # Store numeric values for comparison
             changes = df['Change'].copy()
@@ -112,20 +95,10 @@ class TableFormatter:
             # Add colors and format numbers
             self._format_numeric_columns(df, changes)
         
-        elif 'totalTurnover' in df.columns:  # For market summary data
-            # Select relevant columns and rename
-            summary_cols = {
-                'totalTurnover': 'Total Turnover',
-                'totalTradedShares': 'Total Traded Shares',
-                'totalTransactions': 'Total Transactions',
-                'totalScripTraded': 'Total Scripts Traded',
-                'totalMarketCap': 'Market Capitalization'
-            }
-            df = df[list(summary_cols.keys())]
-            df.columns = list(summary_cols.values())
-            
-            # Format large numbers
-            for col in df.columns:
+        # Format large numbers for market summary
+        for col in df.columns:
+            if col in ['Total Turnover', 'Total Traded Shares', 'Total Transactions', 
+                      'Total Scripts Traded', 'Market Capitalization']:
                 df[col] = df[col].apply(lambda x: f"{float(x):,.2f}")
 
         print(self._format_table(df, headers=headers))

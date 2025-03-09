@@ -178,10 +178,10 @@ class NepseClient:
         data = self.client.getNepseSubIndices()
         if isinstance(data, list):
             return [{
-                'index': item.get('index'),
-                'currentValue': item.get('currentValue'),
-                'change': item.get('change'),
-                'perChange': item.get('perChange')
+                'Sector': item.get('index', ''),
+                'Value': item.get('currentValue', 0),
+                'Change': item.get('change', 0),
+                '%Change': item.get('perChange', 0)
             } for item in data]
         return data
         
@@ -252,13 +252,29 @@ class NepseClient:
     @trace_api
     def get_market_summary(self) -> Dict[str, Any]:
         """Get market summary data"""
-        data = self.client.getMarketSummary()
+        # Get index data for turnover and volume
+        index_data = self.client.getNepseIndex()
+        
+        # Get total market cap from sub-indices
+        sub_indices = self.client.getNepseSubIndices()
+        total_market_cap = sum(float(item.get('marketCapitalization', 0)) 
+                              for item in sub_indices if isinstance(item, dict))
+
+        if isinstance(index_data, list) and index_data:
+            data = index_data[0]
+            return {
+                'Total Turnover': data.get('totalTurnover', 0),
+                'Total Traded Shares': data.get('totalTradedShares', 0),
+                'Total Transactions': data.get('totalTrades', 0),
+                'Total Scripts Traded': data.get('totalScripTraded', 0),
+                'Market Capitalization': total_market_cap
+            }
         return {
-            'totalTurnover': data.get('totalTurnover', 0),
-            'totalTradedShares': data.get('totalTradedShares', 0),
-            'totalTransactions': data.get('totalTransactions', 0),
-            'totalScripTraded': data.get('totalScripTraded', 0),
-            'totalMarketCap': data.get('totalMarketCap', 0)
+            'Total Turnover': 0,
+            'Total Traded Shares': 0,
+            'Total Transactions': 0,
+            'Total Scripts Traded': 0,
+            'Market Capitalization': total_market_cap
         }
 
     @trace_api
