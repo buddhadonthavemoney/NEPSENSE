@@ -1,78 +1,102 @@
-
-
-
 # NEPSENSE
-Complete NEPSE solution in command line
+
+A command-line tool for accessing real-time NEPSE (Nepal Stock Exchange) market data.
+
+## Installation
+
+### Prerequisites
+First, install nepse-cli which is required for data fetching:
+```bash
+pip install nepse-cli
+```
+
+### Install from Source
+```bash
+git clone https://github.com/buddhathapa12/NEPSENSE.git
+cd NEPSENSE
+pip install -e .
+```
+
+After installation, the `priceof` command will be available in your terminal.
+
+## Features
+- Real-time stock prices and market depth
+- Company details and sector information
+- NEPSE index and sub-indices
+- Market summary and sector-wise data
+- Top gainers and losers
+- Floorsheet download (via nepse-cli)
+
+## Usage
+
+### Basic Stock Price Lookup
+```bash
+priceof NABIL          # Single company
+priceof NABIL NBL ADBL # Multiple companies
+```
+
+### Company Details
+```bash
+priceof -d NABIL          # Single company details
+priceof -d NABIL NBL ADBL # Multiple company details
+```
+
+### Market Data
+```bash
+priceof -n           # NEPSE index
+priceof -s           # Sub-indices
+priceof -sec         # Sector-wise summary
+priceof -ms          # Market summary
+priceof --gainers    # Top gainers
+priceof --losers     # Top losers
+priceof -m NABIL     # Market depth for NABIL
+```
+
+### Floorsheet Download
+```bash
+priceof -f           # Download floorsheet to current directory
+priceof -f /path/to  # Download to specific directory
+```
+Note: Floorsheet download requires nepse-cli
+
+### Debug Mode
+```bash
+priceof NABIL --trace  # Show API calls and responses
+```
+
+## Sample Output
+
+### Stock Prices
+```
++---------+--------+--------+---------+--------+--------+--------+--------+---------------+------------+
+| Symbol  | LTP    | Change | %Change | Open   | High   | Low    | Volume | Turnover     | Prev Close |
++---------+--------+--------+---------+--------+--------+--------+--------+---------------+------------+
+| NABIL   | 495.00 | -3.10  | -0.62%  | 498.00 | 502.00 | 493.00 | 53,038 | 26,253,810   | 498.10     |
++---------+--------+--------+---------+--------+--------+--------+--------+---------------+------------+
+```
+
+### Company Details
+```
+Company Information
++---------+--------------------+------------------+--------+--------+---------+----------------+---------------+-----------+-------------+
+| Symbol  | Name               | Sector           | LTP    | Change | %Change | Market Cap     | Listed Shares | Public %  | Promoter % |
++---------+--------------------+------------------+--------+--------+---------+----------------+---------------+-----------+-------------+
+| NABIL   | Nabil Bank Limited | Commercial Banks | 495.00 | -3.10  | -0.62%  | 133,932,142,080| 270,569,984   | 41.56%    | 58.44%     |
++---------+--------------------+------------------+--------+--------+---------+----------------+---------------+-----------+-------------+
+```
+
+## Dependencies
+- Python 3.11+
+- nepse-cli(actual data fetcher lbrary)
+- tabulate, colorama, pandas
+
+## License
+MIT License
+
+## Acknowledgments
+Uses the unofficial NEPSE API by [basic-bgnr](https://github.com/basic-bgnr/NepseUnofficialApi)
 
 https://user-images.githubusercontent.com/52292457/123535784-e636d300-d745-11eb-9fe3-3ad4b8e21078.mp4
 
-
-## Installation
-```console
-pip install nepsense
-````
-After the installation you can use the cli application with the priceof command
-
-## Usage
-```console
-usage: priceof [-h] [-c  [...]] [-f [path ...]] [-n] [-s] [-m symbol] [-ms] [-d] [-cu] [-ci] [--losers] [--gainers]
-[--supply] [--demand] [--turnover] [--volume] [--transactions]
-
-STONK, complete NEPSE solution in command line
-
-optional arguments:
-  -h, --help            show this help message and exit
-  -c  [ ...], --company  [ ...]
-                        symbols of companies seperated by space
-  -f [path ...], --floorsheet [path ...]
-                        Saves today's floorsheet as a csv file You can specify the path as argument. if no argument 
-                        is provided the csv file will be saved in the current directory
-  -n, --nepse           get NEPSE index
-  -s, --sub-indices     get subindices
-  -m symbol, --market_depth symbol
-                        get market depth of a company
-  -ms, --market_summary
-                        get market summary
-  -d , --get_detail     get the non price related detail of the company
-  -cu , --custom        custom list in data.py
-  -ci , --change_index 
-                        change the value of id sent as a payload in the post request
-  --losers              get the top losers
-  --gainers             get the top gainers
-  --supply              get the scripts with maximum supply
-  --demand              get the scripts with maximum demand
-  --turnover            get the scripts with maximum turnover
-  --volume              get the scripts with maximum volume
-  --transactions        get the scripts with maximum transactions
 ```
 
-## Please change the index with -ci flag.
-If you get this type of message when using the cli. Review the following video
-
-https://user-images.githubusercontent.com/52292457/123106754-a1b2eb00-d458-11eb-924c-591f24bcb4e2.mp4
-
-
-Since i can't afford to pay for the nepse api(I don't think I would, even if I could, but anyways). 
-There are some caveats to retrieving data from api endpoints from the nepse's newweb website. Nepse decided
-to change the request method for some api endpoints from get to post. The payload sent along with the
-post request changes randomly at different intervals. 
-The payload looks like 
-```
-{
-  "id" : 123
-}
-```
-Here 123 is a random number. This number can be changed using the -ci flag. To get the id we have to 
-inspect the network traffic while loading the nepse's newweb website. This is demonstrated in the video above
-
-## Floorsheet
-```
-priceof -f [path]
-```
-You can either specify a path or leave it blank. If you leave it blank the floorsheet csv file will be
-saved in you current directory. The floorsheet file will be saved as floorsheet_todaysdate_weekday.csv
-You can do different kind of analysis on the data using the floorsheet.ipynb notebook. 
-
-You can also use my public google collab notebook
-
-https://colab.research.google.com/drive/1DrH_DDVKujF6_bVSOfDWZfwUlvNgV35n#scrollTo=_TS2KwMRPf2S
